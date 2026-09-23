@@ -1,0 +1,23 @@
+# Copy to wiz-git-hook.conf and chmod 600.
+# Do not commit wiz-git-hook.conf.
+
+# Path to the Wiz CLI binary (wiz or wizcli, depending on your install)
+cli_path="wiz"
+
+# Policy names passed to: wizcli scan dir --policies
+wiz_policies="
+Default host configuration policy
+Default IaC policy
+Default image trust admission policy (Wiz CI/CD scan)
+Default malware policy
+Default SAST policy (Wiz CI/CD scan)
+Default secrets policy
+Default sensitive data policy
+Default software license policy
+Default vulnerabilities policy
+"
+
+# Prefer injecting credentials from your environment or a secret manager.
+# Uncomment and fill in only if you must store them in this file:
+# export WIZ_CLIENT_ID=""
+# export WIZ_CLIENT_SECRET=""

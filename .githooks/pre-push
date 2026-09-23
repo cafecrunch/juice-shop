@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Full-directory Wiz CLI scan before a push.
+
+set -euo pipefail
+
+HOOKS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=./wiz-common.sh
+source "$HOOKS_DIR/wiz-common.sh"
+
+load_wiz_conf
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+run_wiz_dir_scan "$REPO_ROOT"

@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Scan only staged files with Wiz CLI before a commit.
+
+set -euo pipefail
+
+HOOKS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=./wiz-common.sh
+source "$HOOKS_DIR/wiz-common.sh"
+
+load_wiz_conf
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+TEMP_PATH="$(mktemp -d "${TMPDIR:-/tmp}/wiz-pre-commit.XXXXXX")"
+cleanup_temp_path() {
+  secure_remove_path "$TEMP_PATH"
+  if [[ -d "$TEMP_PATH" ]]; then
+    echo "Error: Failed to remove temporary directory $TEMP_PATH" >&2
+    exit 1
+  fi
+}
+trap cleanup_temp_path ERR EXIT
+
+staged_count=0
+while IFS= read -r -d '' file; do
+  [[ -f "$file" ]] || continue
+  link_or_copy_staged_file "$file" "$TEMP_PATH/$file"
+  staged_count=$((staged_count + 1))
+done < <(git diff --cached --name-only --diff-filter=ACMR -z)
+
+if [[ "$staged_count" -eq 0 ]]; then
+  echo "Wiz git hook: no staged files to scan." >&2
+  exit 0
+fi
+
+run_wiz_dir_scan "$TEMP_PATH"

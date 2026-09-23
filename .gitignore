@@ -65,3 +65,6 @@ config/*.yml
 
 # System Files
 .DS_Store
+
+# Local Wiz hook credentials (never commit)
+.githooks/wiz-git-hook.conf
